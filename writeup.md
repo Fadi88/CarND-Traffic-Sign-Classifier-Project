@@ -1,9 +1,5 @@
 # **Traffic Sign Recognition** 
 
-## Writeup
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
 ---
 
 **Build a Traffic Sign Recognition Project**
@@ -19,9 +15,9 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/visualization.jpg "Visualization"
-[image2]: ./examples/grayscale.jpg "Grayscaling"
-[image3]: ./examples/random_noise.jpg "Random Noise"
+[image1]: ./graphs/trainings_vis.jpg "Visualization"
+[image2]: ./graphs/input_image.png "Input image"
+[image3]: ./graphs/norm.image.png "Output image"
 [image4]: ./examples/placeholder.png "Traffic Sign 1"
 [image5]: ./examples/placeholder.png "Traffic Sign 2"
 [image6]: ./examples/placeholder.png "Traffic Sign 3"
@@ -32,75 +28,73 @@ The goals / steps of this project are the following:
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-### Writeup / README
-
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one. You can submit your writeup as markdown or pdf. You can use this template as a guide for writing the report. The submission includes the project code.
-
-You're reading it! and here is a link to my [project code](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/Traffic_Sign_Classifier.ipynb)
+### Writeup 
 
 ### Data Set Summary & Exploration
 
-#### 1. Provide a basic summary of the data set. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
-
+#### 1. Basic summary of the data set. 
 I used the pandas library to calculate summary statistics of the traffic
 signs data set:
 
-* The size of training set is ?
-* The size of the validation set is ?
-* The size of test set is ?
-* The shape of a traffic sign image is ?
-* The number of unique classes/labels in the data set is ?
+* The size of training set is 34799 images
+* The size of the validation set is 4410images
+* The size of test set is 4410 images
+* The shape of a traffic sign image is 32x32 pxiel
+* The number of unique classes/labels in the data set is 43
 
-#### 2. Include an exploratory visualization of the dataset.
+#### 2. Exploratory visualization of the dataset.
 
 Here is an exploratory visualization of the data set. It is a bar chart showing how the data ...
 
 ![alt text][image1]
 
+as well as in the HTML report for every sign class the first 7 samples are displayed
+
 ### Design and Test a Model Architecture
 
-#### 1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
+Unlike the LeNet model i deciced to keep the colors in the images and make the conv. layer accpet 3 chanels and this was to add extra features to train the network, for traffic signs not only the shape is important but even for us as humans colors means alot.
 
-As a first step, I decided to convert the images to grayscale because ...
+what did happen however was the normalization for every channel in the three chanel to keep them avearges with with minimum standard divation to give the network a good starting point for training. 
+here is a sample of before and after
+![alt text][image2] ![alt text][image3] 
 
-Here is an example of a traffic sign image before and after grayscaling.
+all the data set were modifed and stored before passing it to the network
 
-![alt text][image2]
+there was some trials with the gray scale iamges (including with precentage of each channel to take) but it was found that the color images yielded and better training accuracy.
 
-As a last step, I normalized the image data because ...
+there was also some trails with the gaussian blur, but it did not lead to any improvement in the accuracy so the image preprocessing with only the normalisation.
 
-I decided to generate additional data because ... 
-
-To add more data to the the data set, I used the following techniques because ... 
-
-Here is an example of an original image and an augmented image:
-
-![alt text][image3]
-
-The difference between the original data set and the augmented data set is the following ... 
+there was no need to add any more data since the model was getting up to 94% accuracy with the validation and test data 
 
 
-#### 2. Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
 
-My final model consisted of the following layers:
+#### 2. Network model.
 
-| Layer         		|     Description	        					| 
+My final model consisted of the 2 convolution layers and 3 fully connected layers (just like LeNet) as follows:
+
+| Layer         		      |     Description	        					                 | 
 |:---------------------:|:---------------------------------------------:| 
-| Input         		| 32x32x3 RGB image   							| 
-| Convolution 3x3     	| 1x1 stride, same padding, outputs 32x32x64 	|
-| RELU					|												|
-| Max pooling	      	| 2x2 stride,  outputs 16x16x64 				|
-| Convolution 3x3	    | etc.      									|
-| Fully connected		| etc.        									|
-| Softmax				| etc.        									|
-|						|												|
-|						|												|
+| Input         		      | 32x32x3 RGB image   						                   	| 
+| Convolution 3x3      	| 1x1 stride, valid padding, outputs 30x30x10 	 |
+| RELU					             |							                                   					|
+| Max pooling	         	| 2x2 stride,  outputs 15x15x10 			            	|
+| Convolution 5x5	      |1x1 stride, valid padding, outputs 11x11x20 	  |
+| RELU	                	|         							                               |
+| Fully connected(1)			 | faltten 2420 from the conv. layer and output 600 	|
+|					RELU             	|												                                   |
+|	Fully connected(2)   	|			600 inputs, 250 outputs				                	|
+| RELU                  |                                               |
+| Fully connected(3)    | 250 inputs, 43 output                         |
+| output layer          | softmax cross entropy                         |
+
+PS: in order to keep the features in the model high to get better accuracy, the second pooling layer was removed
  
 
 
-#### 3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
+#### 3. Model Training.
 
-To train the model, I used an ....
+the training happened with 0.001 learning rate, using Adam optimizer, epochs number of 50 and 64 element in the batch size.
+all those values were ontained by trial and error
 
 #### 4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
 
