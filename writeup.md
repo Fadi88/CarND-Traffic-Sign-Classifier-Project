@@ -18,17 +18,19 @@ The goals / steps of this project are the following:
 [image1]: ./graphs/trainings_vis.jpg "Visualization"
 [image2]: ./graphs/input_image.png "Input image"
 [image3]: ./graphs/norm.image.png "Output image"
-[image4]: ./examples/placeholder.png "Traffic Sign 1"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
-[image6]: ./examples/placeholder.png "Traffic Sign 3"
-[image7]: ./examples/placeholder.png "Traffic Sign 4"
-[image8]: ./examples/placeholder.png "Traffic Sign 5"
+[image4]: ./tests/0.jpg "Traffic Sign 1"
+[image5]: ./tests/1.jpg "Traffic Sign 2"
+[image6]: ./tests/2.jpg "Traffic Sign 3"
+[image7]: ./tests/3.jpg "Traffic Sign 4"
+[image8]: ./tests/4.jpg "Traffic Sign 5"
+[image9]: ./tests/5.jpg "Traffic Sign 6"
+[image10]: ./tests/6.jpg "Traffic Sign 7"
+[image11]: ./tests/7.jpg "Traffic Sign 8"
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-### Writeup 
 
 ### Data Set Summary & Exploration
 
@@ -52,40 +54,44 @@ as well as in the HTML report for every sign class the first 7 samples are displ
 
 ### Design and Test a Model Architecture
 
-Unlike the LeNet model i deciced to keep the colors in the images and make the conv. layer accpet 3 chanels and this was to add extra features to train the network, for traffic signs not only the shape is important but even for us as humans colors means alot.
+Unlike the LeNet model i deciced to keep the colors in the images and make the conv. layer accpet 3 channels and this was to add extra features to train the network, for traffic signs not only the shape is important but even for us as humans colors means alot unlike the MNIST data set where the shape and outline were enough.
 
-what did happen however was the normalization for every channel in the three chanel to keep them avearges with with minimum standard divation to give the network a good starting point for training. 
+what did happen however was the normalization for every channel in the three channel to keep them avearged with minimum standard divation to give the network a good starting point for training. 
 here is a sample of before and after
 ![alt text][image2] ![alt text][image3] 
 
 all the data set were modifed and stored before passing it to the network
 
-there was some trials with the gray scale iamges (including with precentage of each channel to take) but it was found that the color images yielded and better training accuracy.
+there was some trials with the gray scale iamges (including with precentage of each channel to take) but it was found that the color images yielded a better training accuracy.
 
 there was also some trails with the gaussian blur, but it did not lead to any improvement in the accuracy so the image preprocessing with only the normalisation.
 
-there was no need to add any more data since the model was getting up to 94% accuracy with the validation and test data 
+there was no need to add any more data since the model was getting up to 93% accuracy with the validation and test data 
 
 
 
 #### 2. Network model.
 
-My final model consisted of the 2 convolution layers and 3 fully connected layers (just like LeNet) as follows:
+My final model consisted of the 2 convolution layers and 4 fully connected layers as follows:
 
 | Layer         		      |     Description	        					                 | 
 |:---------------------:|:---------------------------------------------:| 
 | Input         		      | 32x32x3 RGB image   						                   	| 
-| Convolution 3x3      	| 1x1 stride, valid padding, outputs 30x30x10 	 |
+| Convolution 7x7      	| 1x1 stride, valid padding, outputs 26x26x10 	 |
 | RELU					             |							                                   					|
-| Max pooling	         	| 2x2 stride,  outputs 15x15x10 			            	|
-| Convolution 5x5	      |1x1 stride, valid padding, outputs 11x11x20 	  |
+| Max pooling	         	| 2x2 stride,  outputs 14x14x10 			            	|
+| Convolution 7x7	      | 1x1 stride, valid padding, outputs 8x8x16  	  |
 | RELU	                	|         							                               |
-| Fully connected(1)			 | faltten 2420 from the conv. layer and output 600 	|
+| dropout              	|   adaptive value                              |
+| Fully connected(1)			 | faltten 784 from the conv. layer and output 550 	|
 |					RELU             	|												                                   |
-|	Fully connected(2)   	|			600 inputs, 250 outputs				                	|
+| dropout              	|   adaptive value                              |
+|	Fully connected(2)   	|			550 inputs, 400 outputs				                	|
 | RELU                  |                                               |
-| Fully connected(3)    | 250 inputs, 43 output                         |
-| output layer          | softmax cross entropy                         |
+| Fully connected(3)    |   400 inputs, 220 outputs                     |
+| RELU                  |                                               |
+|	Fully connected(5)   	|			220 inputs, 43 outputs				                 	|
+| output layer          |     softmax cross entropy                     |
 
 PS: in order to keep the features in the model high to get better accuracy, the second pooling layer was removed
  
@@ -93,27 +99,31 @@ PS: in order to keep the features in the model high to get better accuracy, the 
 
 #### 3. Model Training.
 
-the training happened with 0.001 learning rate, using Adam optimizer, epochs number of 50 and 64 element in the batch size.
-all those values were ontained by trial and error
+the batch size was 50 after trial and error
+
+for the epochs a limit of 80 was picked, however to avoid overfitting early termination was used when validation accrucay got to 94.5% or more
+
+the inital learning rate chosen for the training was 0.023
+
+the initial dropout rate chosen was 20% (0.8 keep prob.)
+
+however to an adaptive approch was picked to control the value of both the dropout ratio and the learning rate 
+when the model got over 90% the learning was decreased to make it converge 
 
 #### 4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
 
 My final model results were:
-* training set accuracy of ?
-* validation set accuracy of ? 
-* test set accuracy of ?
+* training set accuracy of 99.55%
+* validation set accuracy of 94.54%
+* test set accuracy of 93%
 
 If an iterative approach was chosen:
-* What was the first architecture that was tried and why was it chosen?
-* What were some problems with the initial architecture?
-* How was the architecture adjusted and why was it adjusted? Typical adjustments could include choosing a different model architecture, adding or taking away layers (pooling, dropout, convolution, etc), using an activation function or changing the activation function. One common justification for adjusting an architecture would be due to overfitting or underfitting. A high accuracy on the training set but low accuracy on the validation set indicates over fitting; a low accuracy on both sets indicates under fitting.
-* Which parameters were tuned? How were they adjusted and why?
-* What are some of the important design choices and why were they chosen? For example, why might a convolution layer work well with this problem? How might a dropout layer help with creating a successful model?
-
-If a well known architecture was chosen:
-* What architecture was chosen?
-* Why did you believe it would be relevant to the traffic sign application?
-* How does the final model's accuracy on the training, validation and test set provide evidence that the model is working well?
+* the first network tested was the same as LeNet with the final layer changed
+* the main problems with this aproch was overfitting (high training reuslts vs above average test results) and not getting very high accurcay
+* to gain more felxibalty the size of the kernel in each conv.layer was increased to 7*7 to gain more paramters 
+* the second pooling layer was removed and replaced with a dropout to counter the overfitting observed with the orignal approch
+* 2 more fully connected layers were added to add more paramters and more degree of freedoms to the network  
+* it was decided to use a relatively learning rate with a batch size that is not so big wichi might lead to unsteablty so an adaptive learning rate was chosen for when good results were obtained the rate change to help the model converge more towards the least possible error 
  
 
 ### Test a Model on New Images
@@ -123,43 +133,21 @@ If a well known architecture was chosen:
 Here are five German traffic signs that I found on the web:
 
 ![alt text][image4] ![alt text][image5] ![alt text][image6] 
-![alt text][image7] ![alt text][image8]
+![alt text][image7] ![alt text][image8] ![alt text][image9]
+![alt text][image10] ![alt text][image11]
 
-The first image might be difficult to classify because ...
+#### 2. internet images predictions result.
+please check the attached html report 
 
-#### 2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
+#### 3. reulsts discussion 
 
-Here are the results of the prediction:
+5 images were predicted corerctly with high confidence (almost 100% for 4 and one with 99.91%)
 
-| Image			        |     Prediction	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| Stop Sign      		| Stop sign   									| 
-| U-turn     			| U-turn 										|
-| Yield					| Yield											|
-| 100 km/h	      		| Bumpy Road					 				|
-| Slippery Road			| Slippery Road      							|
+the sign of bicycle crossing is predicted as children corssing mostly due to high resemblance specialy at this low resolution
 
+the sign of no vehicles detected as traffic signals with very low confidence (the top result 50.1% vs 49.8% for the correct one)
 
-The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. This compares favorably to the accuracy on the test set of ...
+wild animals crossing was detected as slippery road due to high resemblance specialy at this low resolution
 
-#### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
-
-The code for making predictions on my final model is located in the 11th cell of the Ipython notebook.
-
-For the first image, the model is relatively sure that this is a stop sign (probability of 0.6), and the image does contain a stop sign. The top five soft max probabilities were
-
-| Probability         	|     Prediction	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| .60         			| Stop sign   									| 
-| .20     				| U-turn 										|
-| .05					| Yield											|
-| .04	      			| Bumpy Road					 				|
-| .01				    | Slippery Road      							|
-
-
-For the second image ... 
-
-### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
-#### 1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
 
 
